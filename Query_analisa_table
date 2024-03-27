@@ -1,0 +1,36 @@
+CREATE table kimia_farma.analisa_table AS
+SELECT 
+    ft.transaction_id,
+    ft.date,
+    kc.branch_id,
+    kc.branch_name,
+    kc.kota,
+    kc.provinsi,
+    kc.rating AS rating_cabang,
+    ft.customer_name,
+    ft.product_id,
+    p.product_name,
+    CASE
+        WHEN p.price <= 50000 THEN '10%'
+        WHEN p.price > 50000 AND p.price <= 100000 THEN '15%'
+        WHEN p.price > 100000 AND p.price <= 300000 THEN '20%'
+        WHEN p.price > 300000 AND p.price <= 500000 THEN '25%'
+        ELSE '30%'
+    END AS persentase_gross_laba,
+    ft.price AS actual_price,
+    ft.discount_percentage,
+    ft.price * (1 - (ft.discount_percentage / 100)) AS nett_sales,
+    CASE
+        WHEN p.price <= 50000 THEN ft.price * 0.10
+        WHEN p.price > 50000 AND p.price <= 100000 THEN ft.price * 0.15
+        WHEN p.price > 100000 AND p.price <= 300000 THEN ft.price * 0.20
+        WHEN p.price > 300000 AND p.price <= 500000 THEN ft.price * 0.25
+        ELSE ft.price * 0.30
+    END AS nett_profit,
+    ft.rating AS rating_transaksi
+FROM 
+    kimia_farma.kf_final_transaction ft
+JOIN 
+    kimia_farma.kf_kantor_cabang kc ON ft.branch_id = kc.branch_id
+JOIN 
+    kimia_farma.kf_product p ON ft.product_id = p.product_id;
