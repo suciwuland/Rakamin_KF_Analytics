@@ -1,36 +1,56 @@
-CREATE table kimia_farma.analisa_table AS
+-- Membuat tabel baru dengan nama 'analisa_table' di dataset 'dataset'
+CREATE TABLE dataset.analisa_table AS
+-- Memilih kolom-kolom yang akan dimasukkan ke dalam tabel baru
 SELECT 
-    ft.transaction_id,
-    ft.date,
-    kc.branch_id,
-    kc.branch_name,
-    kc.kota,
-    kc.provinsi,
-    kc.rating AS rating_cabang,
-    ft.customer_name,
-    ft.product_id,
-    p.product_name,
-    CASE
-        WHEN p.price <= 50000 THEN '10%'
-        WHEN p.price > 50000 AND p.price <= 100000 THEN '15%'
-        WHEN p.price > 100000 AND p.price <= 300000 THEN '20%'
-        WHEN p.price > 300000 AND p.price <= 500000 THEN '25%'
-        ELSE '30%'
-    END AS persentase_gross_laba,
-    ft.price AS actual_price,
-    ft.discount_percentage,
-    ft.price * (1 - (ft.discount_percentage / 100)) AS nett_sales,
-    CASE
-        WHEN p.price <= 50000 THEN ft.price * 0.10
-        WHEN p.price > 50000 AND p.price <= 100000 THEN ft.price * 0.15
-        WHEN p.price > 100000 AND p.price <= 300000 THEN ft.price * 0.20
-        WHEN p.price > 300000 AND p.price <= 500000 THEN ft.price * 0.25
-        ELSE ft.price * 0.30
-    END AS nett_profit,
-    ft.rating AS rating_transaksi
+  -- Memilih ID transaksi dari tabel 'kf_final_transaction'
+  ft.transaction_id,
+  -- Memilih tanggal transaksi dari tabel 'kf_final_transaction'
+  ft.date,
+  -- Memilih ID cabang dari tabel 'kf_final_transaction'
+  ft.branch_id,
+  -- Memilih nama cabang dari tabel 'kf_kantor_cabang'
+  kc.branch_name,
+  -- Memilih kota dari tabel 'kf_kantor_cabang'
+  kc.kota,
+  -- Memilih provinsi dari tabel 'kf_kantor_cabang'
+  kc.provinsi,
+  -- Memilih rating cabang dari tabel 'kf_kantor_cabang' dan menamainya sebagai 'rating_cabang'
+  kc.rating AS rating_cabang,
+  -- Memilih nama pelanggan dari tabel 'kf_final_transaction'
+  ft.customer_name,
+  -- Memilih ID produk dari tabel 'kf_final_transaction'
+  ft.product_id,
+  -- Memilih nama produk dari tabel 'kf_product'
+  kp.product_name,
+  -- Memilih harga aktual produk dari tabel 'kf_product' dan menamainya sebagai 'actual_price'
+  kp.price AS actual_price,
+  -- Memilih persentase diskon dari tabel 'kf_final_transaction'
+  ft.discount_percentage,
+  -- Menghitung persentase gross laba berdasarkan harga produk dengan kondisi tertentu
+  CASE 
+    WHEN kp.price <= 50000 THEN kp.price * 0.1
+    WHEN kp.price > 50000 AND kp.price <= 100000 THEN kp.price * 0.15
+    WHEN kp.price > 100000 AND kp.price <= 300000 THEN kp.price * 0.2
+    WHEN kp.price > 300000 AND kp.price <= 500000 THEN kp.price * 0.25
+    ELSE kp.price * 0.3
+  END AS persentase_gross_laba,
+  -- Menghitung nett sales berdasarkan harga aktual produk dan diskon
+  (kp.price - (kp.price * ft.discount_percentage)) AS nett_sales,
+  -- Menghitung nett profit berdasarkan nett sales dan persentase gross laba
+  ((kp.price - (kp.price * ft.discount_percentage)) - 
+   (CASE 
+      WHEN kp.price <= 50000 THEN kp.price * 0.1
+      WHEN kp.price > 50000 AND kp.price <= 100000 THEN kp.price * 0.15
+      WHEN kp.price > 100000 AND kp.price <= 300000 THEN kp.price * 0.2
+      WHEN kp.price > 300000 AND kp.price <= 500000 THEN kp.price * 0.25
+      ELSE kp.price * 0.3
+    END)) AS nett_profit,
+  -- Memilih rating transaksi dari tabel 'kf_final_transaction'
+  ft.rating AS rating_transaksi
+-- Menggabungkan tabel 'kf_final_transaction', 'kf_product', dan 'kf_kantor_cabang' menggunakan operasi JOIN
 FROM 
-    kimia_farma.kf_final_transaction ft
+  dataset.kf_final_transaction ft
 JOIN 
-    kimia_farma.kf_kantor_cabang kc ON ft.branch_id = kc.branch_id
+  dataset.kf_product kp ON ft.product_id = kp.product_id
 JOIN 
-    kimia_farma.kf_product p ON ft.product_id = p.product_id;
+  dataset.kf_kantor_cabang kc ON ft.branch_id = kc.branch_id;
