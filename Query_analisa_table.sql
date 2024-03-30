@@ -1,5 +1,5 @@
 -- Membuat tabel baru dengan nama 'analisa_table' di dataset 'dataset'
-CREATE TABLE dataset.analisa_table AS
+CREATE TABLE kimia_farma.analisa_table AS
 -- Memilih kolom-kolom yang akan dimasukkan ke dalam tabel baru
 SELECT 
   -- Memilih ID transaksi dari tabel 'kf_final_transaction'
@@ -49,8 +49,8 @@ SELECT
   ft.rating AS rating_transaksi
 -- Menggabungkan tabel 'kf_final_transaction', 'kf_product', dan 'kf_kantor_cabang' menggunakan operasi JOIN
 FROM 
-  dataset.kf_final_transaction ft
+  kimia_farma.kf_final_transaction ft
 JOIN 
-  dataset.kf_product kp ON ft.product_id = kp.product_id
+  kimia_farma.kf_product kp ON ft.product_id = kp.product_id
 JOIN 
-  dataset.kf_kantor_cabang kc ON ft.branch_id = kc.branch_id;
+  kimia_farma.kf_kantor_cabang kc ON ft.branch_id = kc.branch_id;
