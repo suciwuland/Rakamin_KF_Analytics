@@ -1,4 +1,4 @@
--- Membuat tabel baru dengan nama 'analisa_table' di dataset 'dataset'
+-- Membuat tabel baru dengan nama 'analisa_table' di dataset 'kimia_farma'
 CREATE TABLE kimia_farma.analisa_table AS
 -- Memilih kolom-kolom yang akan dimasukkan ke dalam tabel baru
 SELECT 
